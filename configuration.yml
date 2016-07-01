@@ -1,0 +1,17 @@
+---
+    username: "admin"
+    password: "password"
+    token: "admin"
+    typeSecurty: false
+    dst:
+      - "http2"
+      - "http1"
+---
+    username: "admin2"
+    password: "password"
+    token: "admin2"
+    typeSecurty: false
+    dst:
+      - "http2"
+      - "http1"
+
