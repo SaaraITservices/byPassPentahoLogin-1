@@ -14,57 +14,52 @@ import com.pentaho.customFilter.dao.DaoConfiguration;
 
 public class InjectUser extends HttpServletRequestWrapper
 {
-    private final Map<String, String[]> modifiableParameters;
-    private Map<String, String[]> allParameters = null;
-    private Map<String, String[]> additionalParams = new HashMap<String, String[]>();
+  private final Map<String, String[]> modifiableParameters;
+  private Map<String, String[]> allParameters = null;
+  private Map<String, String[]> additionalParams = new HashMap<String, String[]>();
     
-    public InjectUser(ServletRequest request, DaoConfiguration daoConfiguration )
-    {
+  public InjectUser(ServletRequest request, DaoConfiguration daoConfiguration ) {
         super((HttpServletRequest) request);
+    System.out.println("USER:" + daoConfiguration.getUsername());
+    System.out.println("PASS:" + daoConfiguration.getPassword());
         
-        modifiableParameters = new TreeMap<String, String[]>();
-    	additionalParams.put("userid", new String[] { 
-    			daoConfiguration.getUsername()
-    			});
-    	additionalParams.put("password", new String[] {
-    			daoConfiguration.getPassword()
-    			});
-        modifiableParameters.putAll(additionalParams);   
+    modifiableParameters = new TreeMap<String, String[]>();
+    additionalParams.put("userid", new String[] {
+            daoConfiguration.getUsername()
+        });
+    additionalParams.put("password", new String[] {
+            daoConfiguration.getPassword()
+        });
+    modifiableParameters.putAll(additionalParams);
+  }
+    
+  @Override
+    public String getParameter(final String name) {
+    String[] strings = getParameterMap().get(name);
+    if (strings != null) {
+      return strings[0];
     }
-
-	@Override
-    public String getParameter(final String name)
-    {
-        String[] strings = getParameterMap().get(name);
-        if (strings != null)
-        {
-            return strings[0];
-        }
-        return super.getParameter(name);
+    return super.getParameter(name);
+  }
+    
+  @Override
+    public Map<String, String[]> getParameterMap() {
+    if (allParameters == null) {
+      allParameters = new TreeMap<String, String[]>();
+      allParameters.putAll(super.getParameterMap());
+      allParameters.putAll(modifiableParameters);
     }
-
-    @Override
-    public Map<String, String[]> getParameterMap()
-    {
-        if (allParameters == null)
-        {
-            allParameters = new TreeMap<String, String[]>();
-            allParameters.putAll(super.getParameterMap());
-            allParameters.putAll(modifiableParameters);
-        }
-        //Return an unmodifiable collection because we need to uphold the interface contract.
-        return Collections.unmodifiableMap(allParameters);
-    }
-
-    @Override
-    public Enumeration<String> getParameterNames()
-    {
-        return Collections.enumeration(getParameterMap().keySet());
-    }
-
-    @Override
-    public String[] getParameterValues(final String name)
-    {
-        return getParameterMap().get(name);
-    }
+    //Return an unmodifiable collection because we need to uphold the interface contract.
+    return Collections.unmodifiableMap(allParameters);
+  }
+    
+  @Override
+  public Enumeration<String> getParameterNames() {
+    return Collections.enumeration(getParameterMap().keySet());
+  }
+    
+  @Override
+  public String[] getParameterValues(final String name) {
+    return getParameterMap().get(name);
+  }
 }

@@ -3,7 +3,8 @@ package com.pentaho.customFilter;
 
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+
 
 
 import javax.servlet.ServletException;
@@ -16,49 +17,58 @@ import com.pentaho.customFilter.singelton.LoadConfigurationSingelton;
 import com.pentaho.customFilter.util.ExcepcionPentahoFilterSearch;
 import com.pentaho.customFilter.util.UtilsPentahoFilter;
 
-public class FilterSecurity extends HttpServlet {
+public class FilterSecurity	 extends HttpServlet {
+    
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
-      
-    public FilterSecurity() {
+
+public FilterSecurity() {
         super();
-    }
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		String dst = (String) request.getParameter("dst");
-		String token = (String) request.getParameter("token");
-		String destination = null;
-		
-		List<DaoConfiguration>_configurationList = LoadConfigurationSingelton.getInstance();
-		UtilsPentahoFilter utils = new UtilsPentahoFilter();
-		
-		try {
-			
-			if (token.equals( utils.getObjectByToken(token, _configurationList).getTokenMD5())){
-				destination = utils.getObjectByToken(token, _configurationList).getDst().get(Integer.parseInt(dst.substring(3)));
-			}
-			
-			System.out.println("Token: "+utils.getObjectByToken(token, _configurationList).getToken());
-			System.out.println("TokenMD5: "+utils.getObjectByToken(token, _configurationList).getTokenMD5());
-			System.out.println("dst: "+utils.getObjectByToken(token, _configurationList).getDst());
-			
-			
-		} catch (ExcepcionPentahoFilterSearch e) {
-			
-		}
-	
-		if( destination.indexOf("?")> 0){
-			destination = destination  +  request.getQueryString();
-		}else{
-			destination = destination  + "?" +  request.getQueryString();
-		}
-		 
-		response.sendRedirect(destination);
+  }
+    
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
+    String dst = (String) request.getParameter("dst");
+    String token = (String) request.getParameter("token");
+    String destination = null;
+        
+    HashMap<String, DaoConfiguration> _configurationList = LoadConfigurationSingelton.getInstance();
+    UtilsPentahoFilter utils = new UtilsPentahoFilter();
+        
+    try {
+    	System.out.println (">>>>"+_configurationList.containsKey(token));
+      if (_configurationList.containsKey(token)){
+        System.out.println("The" + token + "is in a list");
+        destination = utils.getObjectByToken(token, _configurationList).getDst().get(dst);
+      } else {
+        throw new ExcepcionPentahoFilterSearch("This token is not on the list"+ token);
+      }
+                       
+            
+    } catch (ExcepcionPentahoFilterSearch e) {
+      e.printStackTrace();
+      try {
+		throw new ExcepcionPentahoFilterSearch(e + "###" + token);
+	} catch (ExcepcionPentahoFilterSearch e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
 	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
-	}
-
+    }
+        
+    if (destination.indexOf("?")>0) {
+      destination = destination  +  request.getQueryString();
+    } else{
+      destination = destination  + "?" +  request.getQueryString();
+    }
+        
+    response.sendRedirect(destination);
+        
+  }
+    
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    doGet(request, response);
+  }
+    
 }

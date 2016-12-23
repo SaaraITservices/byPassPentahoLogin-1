@@ -1,17 +1,9 @@
 ---
-    username: "admin"
-    password: "password"
-    token: "admin"
-    typeSecurty: false
-    dst:
-      - "http2"
-      - "http1"
----
-    username: "admin2"
-    password: "password"
-    token: "admin2"
-    typeSecurty: false
-    dst:
-      - "http2"
-      - "http1"
+username: "admin"
+password: "password"
+token: "admin" # 21232f297a57a5a743894a0e4a801fc3
+typeSecurty: false # random token
+dst:
+       ctools : "/pentaho/api/repos/%3Apublic%3ASteel%20Wheels%3ADashboards%3ACTools_dashboard.wcdf/generatedContent" #kpis
+       report : "/pentaho/api/repos/%3Apublic%3ASteel Wheels%3AReports%3ATop Customers (report).prpt/viewer" #products
 
